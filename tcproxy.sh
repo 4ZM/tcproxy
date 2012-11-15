@@ -17,8 +17,28 @@
 # [DST: Eg. DB Server] <-> [PROXY] <-> [Application]
 #
 
+# Default arg values
+INTERFACE=eth0
+LATENCY=200ms
+LOSS=1.0%
+CORRUPTION=
+
+# Parse args
+NO_ARGS=$#
+while [ $# -gt 0 ] ; do
+  case $1 in
+    --dst)        DSTIP=$2      ; shift 2 ;;
+    --interface)  INTERFACE=$2  ; shift 2 ;;
+    --latency)    LATENCY=$2    ; shift 2 ;;
+    --loss)       LOSS=$2       ; shift 2 ;; 
+    --corruption) CORRUPTION=$2 ; shift 2 ;;
+    --help)       HELP="yes"    ; shift 1 ;;
+     *)                           shift 1 ;;
+  esac
+done
+
 # Usage on missing args
-if [ $# -eq 0 ] ; then
+if [ $NO_ARGS -eq 0 ] || [ "x$HELP" = "xyes" ]; then
   echo "Usage: $0 --dst xx.xx.xx.xx [--interface eth0] [--latency 200ms] [--loss 1.0%] [--corruption 0.1%]"
   exit 1
 fi
@@ -28,24 +48,6 @@ if [[ $EUID -ne 0 ]]; then
   echo "Only root can run this script"
   exit 1
 fi
-
-# Default arg values
-INTERFACE=eth0
-LATENCY=200ms
-LOSS=1.0%
-CORRUPTION=
-
-# Parse args
-while [ $# -gt 1 ] ; do
-  case $1 in
-    --dst)        DSTIP=$2      ; shift 2 ;;
-    --interface)  INTERFACE=$2  ; shift 2 ;;
-    --latency)    LATENCY=$2    ; shift 2 ;;
-    --loss)       LOSS=$2       ; shift 2 ;; 
-    --corruption) CORRUPTION=$2 ; shift 2 ;;
-     *)                           shift 1 ;;
-  esac
-done
 
 # Find the IP:addr of the specified interface.
 PROXYIP=$(ifconfig $INTERFACE | sed -r -n "s/^.*inet addr:([0-9\.]+).*$/\1/p")
