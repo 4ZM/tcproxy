@@ -69,21 +69,26 @@ iptables -F -t nat
 iptables -A PREROUTING  -t nat -p tcp -d $PROXYIP -j DNAT --to $DSTIP
 iptables -A POSTROUTING -t nat -p tcp -d $DSTIP -j SNAT --to $PROXYIP
 
+TC_CMD="tc qdisc replace dev $INTERFACE root netem"
+
 # Latency
 if [ "$LATENCY" ] ; then
   echo "[+] Adding $LATENCY latency to $INTERFACE"
-  tc qdisc replace dev $INTERFACE root netem delay $LATENCY
+  TC_CMD="$TC_CMD delay $LATENCY"
 fi
 
 # Random package loss
 if [ "$LOSS" ] ; then
   echo "[+] Adding $LOSS package loss to $INTERFACE"
-  tc qdisc replace dev $INTERFACE root netem loss $LOSS
+  TC_CMD="$TC_CMD loss $LOSS"
 fi
 
 # Single bit corruption of packages
 if [ "$CORRUPTION" ] ; then
   echo "[+] Adding $CORRUPTION package single bit corruption to $INTERFACE"
-  tc qdisc replace dev $INTERFACE root netem corrupt $CORRUPTION 
+  TC_CMD="$TC_CMD corrupt $CORRUPTION"
 fi
+
+# Execute the tc cmd
+$TC_CMD
 
