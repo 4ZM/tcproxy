@@ -78,12 +78,12 @@ fi
 # Random package loss
 if [ "$LOSS" ] ; then
   echo "[+] Adding $LOSS package loss to $INTERFACE"
-  tc qdisc replace dev eth0 root netem loss $LOSS
+  tc qdisc replace dev $INTERFACE root netem loss $LOSS
 fi
 
 # Single bit corruption of packages
 if [ "$CORRUPTION" ] ; then
   echo "[+] Adding $CORRUPTION package single bit corruption to $INTERFACE"
-  tc qdisc replace dev eth0 root netem corrupt $CORRUPTION 
+  tc qdisc replace dev $INTERFACE root netem corrupt $CORRUPTION 
 fi
 
