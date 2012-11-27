@@ -68,8 +68,8 @@ iptables -F
 iptables -P FORWARD ACCEPT
 
 iptables -F -t nat
-iptables -A PREROUTING  -t nat -p tcp -d $PROXYIP -j DNAT --to $DSTIP
-iptables -A POSTROUTING -t nat -p tcp -d $DSTIP -j SNAT --to $PROXYIP
+iptables -A PREROUTING  -t nat -d $PROXYIP -j DNAT --to $DSTIP
+iptables -A POSTROUTING -t nat -d $DSTIP -j SNAT --to $PROXYIP
 
 TC_CMD="tc qdisc replace dev $INTERFACE root netem"
 
